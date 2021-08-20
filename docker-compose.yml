@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  db:
+    ports:
+      - '5432:5432'
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - /home/kamil/PersonalProjects/enroute/devops/docker/development/db/volume:/var/lib/postgresql/data
+    networks:
+      - postgres
+  web:
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      args:
+         USER_ID: 1000
+         GROUP_ID: 1000
+         USER_NAME: $USER
+      dockerfile: ./devops/docker/development/Dockerfile
+    volumes:
+      - .:/home/kamil/app
+    environment:
+      - RAILS_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - postgres
+networks:
+  postgres:
